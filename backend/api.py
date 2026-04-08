@@ -24,7 +24,7 @@ Environment variables (required):
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
-KEYCLOAK_BASE = os.getenv("KEYCLOAK_BASE_URL", "http://localhost:8080").rstrip("/")
+KEYCLOAK_BASE = os.getenv("KEYCLOAK_BASE_URL", "http://localhost:8083").rstrip("/")
 KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM", "master")
 KEYCLOAK_ADMIN_REALM = os.getenv("KEYCLOAK_ADMIN_REALM", "master")
 KEYCLOAK_ADMIN_USER = os.getenv("KEYCLOAK_ADMIN_USERNAME")
