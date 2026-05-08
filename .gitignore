@@ -28,3 +28,7 @@ pnpm-debug.log*
 __pycache__/
 *.pyc
 *.pyo
+
+#keycloak files
+*.mv.db
+*.trace.db
