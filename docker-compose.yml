@@ -5,8 +5,8 @@ services:
     container_name: waitlist_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: waitlist_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
@@ -19,22 +19,24 @@ services:
       retries: 5
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.1.4
+    command: start-dev --import-realm
+    volumes:
+    - ./keycloak/waitlist-realm-export.json:/opt/keycloak/data/import/waitlist-realm-export.json
+    image: quay.io/keycloak/keycloak:26.4.2
     container_name: waitlist_keycloak
-    restart: always
-    command: start-dev
     environment:
       KC_DB: mysql
-      KC_DB_URL: jdbc:mysql://mysql:3306/waitlist_db
-      KC_DB_USERNAME: root
-      KC_DB_PASSWORD: rootpassword
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB_URL: jdbc:mysql://mysql:3306/${DB_NAME}
+      KC_DB_USERNAME: ${DB_USER}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     ports:
       - "8083:8080"
     depends_on:
       mysql:
         condition: service_healthy
+    restart: on-failure
 
   backend:
     build: ./backend
@@ -43,16 +45,16 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./backend/.env
+      - .env
     depends_on:
       mysql:
         condition: service_healthy
     environment:
       DB_HOST: mysql
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: rootpassword
-      DB_NAME: waitlist_db
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
       KEYCLOAK_BASE_URL: http://keycloak:8080
 
 volumes:
